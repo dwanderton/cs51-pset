@@ -27,6 +27,7 @@ object (self)
   (******************************)
 
   (* ### TODO: Part 3 Actions ### *)
+  val mutable pollenlst = []
 
   (* ### TODO: Part 5 Smart Bees ### *)
 
@@ -37,6 +38,8 @@ object (self)
   (***********************)
 
   (* ### TODO: Part 3 Actions ### *)
+  initializer 
+  self#register_handler World.action_event self#do_action
 
   (* ### TODO: Part 6 Custom Events ### *)
 
@@ -51,7 +54,15 @@ object (self)
   (**************************)
 
   (* ### TODO: Part 3 Actions ### *)
+  method private deposit_pollen neighbor =
+     pollenlst <- (neighbor#receive_pollen pollenlst)
 
+
+  method private extract_pollen neighbor = 
+    match neighbor#forfeit_pollen with
+    | None -> ()
+    | Some pollen_id -> (pollenlst <- (pollen_id::pollenlst))   
+ 
   (* ### TODO: Part 5 Smart Bees ### *)
 
   (********************************)
@@ -63,12 +74,20 @@ object (self)
   method get_name = "bee"
 
   (* ### TODO: Part 4 Aging ### *)
-  method draw = Draw.circle self#get_pos World.obj_width World.obj_height Graphics.yellow Graphics.black ""
+  method draw = Draw.circle self#get_pos World.obj_width World.obj_height Graphics.yellow Graphics.black (string_of_int (List.length pollenlst))
 
   method draw_z_axis = 2
 
 
   (* ### TODO: Part 3 Actions ### *)
+
+  method private do_action = 
+    let deposit_extract_pollen obj = 
+     (self#deposit_pollen obj;self#extract_pollen obj) in
+    let neighbors = World.get (self#get_pos) in
+     (fun _ -> List.iter  (deposit_extract_pollen) neighbors) 
+ 
+   
 
   (***************************)
   (***** Movable Methods *****)
@@ -91,3 +110,4 @@ object (self)
   (* ### TODO: Part 5 Smart Bees ### *)
 
 end
+
