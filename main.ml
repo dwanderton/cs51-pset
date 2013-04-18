@@ -37,7 +37,7 @@ let gen_hive () =
 let part1_initializer () : unit =
   ignore (new Pond.pond (0,0)) ;
   ignore (new Flower.flower (1,1) 0) ;
-  let hive = new Hive.hive (2,2) in
+  let hive = new Hive.hive (2,2)  in
   ignore (new Bee.bee (3,3)) ;
   ignore (new Cave.cave (4,4)) ;
   ignore (new Bear.bear (5,5) hive (new Cave.cave (0,0))) ;

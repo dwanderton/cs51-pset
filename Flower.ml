@@ -55,8 +55,8 @@ object (self)
     (fun _ -> Helpers.with_inv_probability World.rand bloom_probability (fun _ -> (World.spawn 1 p (fun p -> ignore (new flower p pollen_id)))))
 
   method private do_action = 
-     self#bloom;
-     self#produce_pollen
+     (self#bloom;
+     self#produce_pollen)
 
 
   (********************************)
@@ -78,7 +78,10 @@ object (self)
 
 
   method forfeit_pollen = 
-      let _ = Helpers.with_inv_probability (World.rand) forfeit_pollen_probability (fun _ -> pollen_amt <- (pollen_amt -1)) in self#smells_like_pollen
+      if pollen_amt <= 0 then None 
+      else 
+        let _ = Helpers.with_inv_probability (World.rand) forfeit_pollen_probability 
+                (fun _ -> pollen_amt <- (pollen_amt -1)) in self#smells_like_pollen 
 
   (* ### TODO: Part 3 Actions ### *)
 

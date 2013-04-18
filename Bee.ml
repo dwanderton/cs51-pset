@@ -84,8 +84,7 @@ object (self)
   method private do_action = 
     let deposit_extract_pollen obj = 
      (self#deposit_pollen obj;self#extract_pollen obj) in
-    let neighbors = World.get (self#get_pos) in
-     (fun _ -> List.iter  (deposit_extract_pollen) neighbors) 
+     (fun _ -> let neighbors = World.get (self#get_pos) in List.iter  (deposit_extract_pollen) neighbors)  
  
    
 
