@@ -2,6 +2,7 @@ open WorldObject
 open WorldObjectI
 open Ageable
 
+
 (* ### Part 2 Movement ### *)
 let bee_inverse_speed = Some 1
 
@@ -23,7 +24,7 @@ object
 
   method private next_direction_default : Direction.direction option 
 end 
-class bee p (home:world_object_i) : bee_t = object(self)
+class bee p (home:world_object_i): bee_t = object(self)
   inherit CarbonBased.carbon_based p bee_inverse_speed (World.rand bee_lifetime) bee_lifetime
 
   (******************************)
@@ -34,6 +35,10 @@ class bee p (home:world_object_i) : bee_t = object(self)
   val mutable pollenlst = []
 
   (* ### TODO: Part 5 Smart Bees ### *)
+
+  val sensing_range = World.rand max_sensing_range
+  
+  val pollen_types = World.rand max_pollen_types + 1
 
   (* ### TODO: Part 6 Custom Events ### *)
 
@@ -59,15 +64,32 @@ class bee p (home:world_object_i) : bee_t = object(self)
 
   (* ### TODO: Part 3 Actions ### *)
   method private deposit_pollen neighbor =
-     pollenlst <- (neighbor#receive_pollen pollenlst)
-
+     pollenlst <- ((neighbor:>WorldObjectI.world_object_i)#receive_pollen pollenlst)
 
   method private extract_pollen neighbor = 
-    match neighbor#forfeit_pollen with
+    match (neighbor:>WorldObjectI.world_object_i)#forfeit_pollen with
     | None -> ()
     | Some pollen_id -> (pollenlst <- (pollen_id::pollenlst))   
  
   (* ### TODO: Part 5 Smart Bees ### *)
+
+  method private magnet_flower : world_object_i option = 
+    let inrangelst = World.objects_within_range self#get_pos sensing_range in
+      let rec intersect lst1 lst2 =
+        match lst1 with
+        | [] -> []
+        | h::t -> if (List.exists (fun x -> 
+                                     match (h#smells_like_pollen) with
+                                     | None -> false
+                                     | Some pollID -> (pollID =x)) lst2) then h::(intersect t lst2)
+                 else (intersect t lst2) in
+      let intersectlst = (intersect inrangelst pollenlst) in
+        match intersectlst with
+        | [] -> None 
+        | h::t -> let closestObj = (List.fold_right (fun x y -> if ((Direction.distance self#get_pos x#get_pos) < 
+      (Direction.distance self#get_pos y#get_pos)) then x 
+                                                 else  y) (intersect inrangelst pollenlst) h) in Some closestObj 
+   
 
   (********************************)
   (***** WorldObjectI Methods *****)
@@ -86,9 +108,9 @@ class bee p (home:world_object_i) : bee_t = object(self)
   (* ### TODO: Part 3 Actions ### *)
 
   method private do_action = 
-    let deposit_extract_pollen obj = 
-     (self#deposit_pollen obj;self#extract_pollen obj) in
-     (fun _ -> let neighbors = World.get (self#get_pos) in List.iter  (deposit_extract_pollen) neighbors)  
+    (*let deposit_extract_pollen obj = 
+     (self#deposit_pollen obj;self#extract_pollen obj) in*)
+     (fun _ -> let neighbors = World.get (self#get_pos) in List.iter (self#deposit_pollen;self#extract_pollen) neighbors)  
  
    
 
@@ -99,7 +121,11 @@ class bee p (home:world_object_i) : bee_t = object(self)
   (* ### TODO: Part 2 Movement ### *)
 
   method private next_direction = 
-      Some (Direction.random World.rand)
+    if (List.length (Helpers.unique pollenlst) > pollen_types) then 
+      World.direction_from_to self#get_pos home#get_pos
+    else match self#magnet_flower with
+         | None -> self#next_direction_default
+         | Some fl -> World.direction_from_to self#get_pos fl#get_pos
 
 
   (* ### TODO: Part 5 Smart Bees ### *)
