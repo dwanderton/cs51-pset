@@ -17,9 +17,14 @@ let max_sensing_range = 5
 (** Bees travel the world searching for honey.  They are able to sense flowers
     within close range, and they will return to the hive once they have
     pollenated enough species of flowers. *)
-class bee p: Ageable.ageable_t =
-object (self)
-  inherit (CarbonBased.carbon_based p bee_inverse_speed (World.rand bee_lifetime) bee_lifetime)  
+class type bee_t =
+object 
+  inherit Ageable.ageable_t
+
+  method private next_direction_default : Direction.direction option 
+end 
+class bee p (home:world_object_i) : bee_t = object(self)
+  inherit CarbonBased.carbon_based p bee_inverse_speed (World.rand bee_lifetime) bee_lifetime
 
   (******************************)
   (***** Instance Variables *****)
@@ -93,7 +98,7 @@ object (self)
 
   (* ### TODO: Part 2 Movement ### *)
 
-  method next_direction = 
+  method private next_direction = 
       Some (Direction.random World.rand)
 
 
@@ -106,6 +111,8 @@ object (self)
   (***********************)
 
   (* ### TODO: Part 5 Smart Bees ### *)
+
+  method private next_direction_default = None
 
 end
 

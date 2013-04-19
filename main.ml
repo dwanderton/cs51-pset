@@ -38,7 +38,7 @@ let part1_initializer () : unit =
   ignore (new Pond.pond (0,0)) ;
   ignore (new Flower.flower (1,1) 0) ;
   let hive = new Hive.hive (2,2)  in
-  ignore (new Bee.bee (3,3)) ;
+  ignore (new Bee.bee (3,3) (hive:>WorldObjectI.world_object_i)) ;
   ignore (new Cave.cave (4,4)) ;
   ignore (new Bear.bear (5,5) hive) ;
   ignore (new Pasture.pasture (6,6)) ;
@@ -47,7 +47,7 @@ let part1_initializer () : unit =
 
 let part2_initializer () : unit =
   let hive = gen_hive () in
-  ignore (new Bee.bee (World.size/2+1,World.size/2)) ;
+  ignore (new Bee.bee (World.size/2+1,World.size/2) (hive:>WorldObjectI.world_object_i)) ;
   gen_bear hive ;
   gen_cow hive
 
@@ -59,7 +59,7 @@ let part3_initializer () : unit =
   gen_flowers () ;
 
   for i = 1 to 20 do
-    ignore (new Bee.bee (World.size/2+1,World.size/2)) ;
+    ignore (new Bee.bee (World.size/2+1,World.size/2) (hive:>WorldObjectI.world_object_i)) ;
   done;
 
   gen_bear hive ;

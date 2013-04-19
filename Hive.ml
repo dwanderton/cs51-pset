@@ -46,7 +46,7 @@ inherit world_object p as super
 
   method private do_action = 
     fun _ -> ((Helpers.with_inv_probability World.rand pollen_probability (fun _ -> (pollen_amt <- (pollen_amt + 1))));
-             (Helpers.with_inv_probability World.rand spawn_probability ((fun _ -> (pollen_amt <- (pollen_amt + 1)));(fun _ -> self#generate_bee))))
+             (Helpers.with_inv_probability World.rand spawn_probability ((pollen_amt <- (pollen_amt + 1));(fun _ -> self#generate_bee))))
 
   (* ### TODO: Part 4 Aging ### *) 
 
@@ -57,8 +57,8 @@ inherit world_object p as super
   (* ### TODO: Part 4 Aging ### *)
 
   method private generate_bee = 
-    ignore (new Bee.bee self#get_pos)
-
+    (ignore (new BeeBouncy.bee_bouncy self#get_pos (self:>WorldObjectI.world_object_i)); 
+     ignore (new BeeRandom.bee_random self#get_pos (self:>WorldObjectI.world_object_i)))
 
   (* ### TODO: Part 5 Smart Bees ### *)
 

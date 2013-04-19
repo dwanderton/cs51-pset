@@ -47,10 +47,8 @@ object (self)
   (* ### TODO: Part 3 Actions ### *)
 
   method private produce_pollen = 
-   fun _ ->
-   (if pollen_amt <= max_pollen then
-       Helpers.with_inv_probability World.rand produce_pollen_probability (fun _ -> (pollen_amt <- (pollen_amt + 1)))
-   else ())
+       Helpers.with_inv_probability World.rand produce_pollen_probability 
+         (fun _ -> (if (pollen_amt < max_pollen) then  (pollen_amt <- (pollen_amt + 1)) else ()))
 
   method private bloom = 
     (fun _ -> Helpers.with_inv_probability World.rand bloom_probability (fun _ -> (World.spawn 1 p 
@@ -82,9 +80,9 @@ object (self)
   method forfeit_pollen = 
       if pollen_amt <= 0 then None 
       else 
-        if (World.rand forfeit_pollen_probability = 0) then
-          ((fun _ -> (pollen_amt <- (pollen_amt -1))); Some pollen_id) 
-        else None
+         if (World.rand forfeit_pollen_probability = 0) then
+           ((pollen_amt <- (pollen_amt -1)); Some pollen_id) 
+         else None
 
   (* ### TODO: Part 3 Actions ### *)
 

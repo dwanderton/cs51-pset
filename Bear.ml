@@ -43,7 +43,7 @@ class bear p hive : Movable.movable_t =
 
     method private do_action =
       (*(let (a, b) = self#get_pos in print_string("("^string_of_int(a)^","^string_of_int(b)^")"));*)
-        (if (self#get_pos = (World.size/2,World.size/2)) then
+        (if ((self:>world_object_i)#get_pos = (World.size/2,World.size/2)) then
         ((print_string "OH SNAP ");(fun _ -> (stolen_amt <- (stolen_amt + hive#forfeit_honey pollen_theft_amount (self :> world_object_i)))))
       else
         fun _ -> ())
