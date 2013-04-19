@@ -21,18 +21,18 @@ object (self)
       match inv_speed with
       | None -> ()
       | Some s -> self#register_handler (Event.buffer s World.move_event) (fun _ -> self#do_move)
-  
+     method private do_move = self#move self#next_direction  
+
   
 
   (* ### TODO: Part 2 Movement ### *)
 
   (**************************)
   (***** Event Handlers *****)
-  (**************************)
-  method private do_move = self#move self#next_direction  
-    
+  (**************************)    
 
   (* ### TODO: Part 2 Movement ### *)
+
 
 
   (* ### TODO: Part 2 Movement ### *)

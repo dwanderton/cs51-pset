@@ -31,11 +31,17 @@ object (self)
 
   (* ### TODO: Part 4 Aging ### *)
 
+  initializer 
+    self#register_handler World.age_event self#do_age
+
   (**************************)
   (***** Event Handlers *****)
   (**************************)
 
   (* ### TODO: Part 4 Aging ### *)
+
+  method private do_age =
+      fun _ -> (if lifetime = 0 then self#die else (lifetime <- lifetime -1))
 
   (**************************)
   (***** Helper Methods *****)
@@ -58,7 +64,10 @@ object (self)
   (***************************)
 
   (* ### TODO: Part 4 Aging ### *)
-  method draw_picture = raise TODO
-  method reset_life = raise TODO
+  method draw_picture = ()
+    
+
+  method reset_life = 
+    lifetime <- max_lifetime
 
 end

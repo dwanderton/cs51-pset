@@ -1,6 +1,7 @@
 open WorldObject
 open WorldObjectI
 open Helpers
+open Ageable
 
 (* ### Part 3 Actions ### *)
 let next_pollen_id = ref 0
@@ -18,9 +19,9 @@ let flower_lifetime = 2000
 
 (** Flowers produce pollen.  They will also eventually die if they are not cross
     pollenated. *)
-class flower p (pollen_id: int) : world_object_i =
+class flower p (pollen_id: int) : Ageable.ageable_t =
 object (self)
-  inherit world_object p as super
+  inherit (CarbonBased.carbon_based p None (World.rand flower_lifetime) flower_lifetime)
 
   (******************************)
   (***** Instance Variables *****)
@@ -52,11 +53,12 @@ object (self)
    else ())
 
   method private bloom = 
-    (fun _ -> Helpers.with_inv_probability World.rand bloom_probability (fun _ -> (World.spawn 1 p (fun p -> ignore (new flower p pollen_id)))))
+    (fun _ -> Helpers.with_inv_probability World.rand bloom_probability (fun _ -> (World.spawn 1 p 
+                                                                                  (fun p -> ignore (new flower p pollen_id)))))
 
   method private do_action = 
-     (self#bloom;
-     self#produce_pollen)
+     (self#produce_pollen;
+     self#bloom)
 
 
   (********************************)
@@ -68,7 +70,7 @@ object (self)
   method get_name = "flower"
 
   (* ### TODO: Part 4 Aging ### *)
-  method draw = Draw.circle self#get_pos World.obj_width World.obj_height (Graphics.rgb 255 150 255) Graphics.black (string_of_int pollen_amt) 
+  method draw_picture = Draw.circle self#get_pos World.obj_width World.obj_height (Graphics.rgb 255 150 255) Graphics.black (string_of_int pollen_amt) 
 
   method draw_z_axis = 1
 
@@ -80,8 +82,9 @@ object (self)
   method forfeit_pollen = 
       if pollen_amt <= 0 then None 
       else 
-        let _ = Helpers.with_inv_probability (World.rand) forfeit_pollen_probability 
-                (fun _ -> pollen_amt <- (pollen_amt -1)) in self#smells_like_pollen 
+        if (World.rand forfeit_pollen_probability = 0) then
+          ((fun _ -> (pollen_amt <- (pollen_amt -1))); Some pollen_id) 
+        else None
 
   (* ### TODO: Part 3 Actions ### *)
 
@@ -91,5 +94,9 @@ object (self)
   (***************************)
 
   (* ### TODO: Part 4 Aging ### *)
+
+  method receive_pollen pollen_lst =
+    (if (List.exists (fun elt -> elt != pollen_id) pollen_lst) then (self#reset_life) 
+    else ());pollen_lst 
 
 end

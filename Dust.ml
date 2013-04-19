@@ -12,4 +12,6 @@ object (self)
 
   (* ### TODO: Part 4 Aging ### *)
 
+  method draw_picture = Draw.circle self#get_pos World.obj_width World.obj_height (Graphics.rgb 150 150 150) Graphics.black (String.sub name 0 2) 
+
 end

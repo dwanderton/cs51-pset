@@ -11,7 +11,7 @@ let bear_starting_life = 20
 (* ### Part 2 Movement ### *)
 let bear_inverse_speed = Some 10
 
-class bear p hive cave : Movable.movable_t =
+class bear p hive : Movable.movable_t =
   object (self)
     inherit Movable.movable p bear_inverse_speed as super
 
@@ -23,7 +23,6 @@ class bear p hive cave : Movable.movable_t =
   (* ### TODO: Part 3 Actions ### *)
 
     val mutable stolen_amt = 0
-    val mutable honey_amt = 0
 
   (* ### TODO: Part 6 Events ### *)
 
@@ -43,10 +42,12 @@ class bear p hive cave : Movable.movable_t =
   (* ### TODO: Part 3 Actions ### *)
 
     method private do_action =
-      if (self#get_pos = hive#get_pos) then
-        fun _ -> (stolen_amt <- (stolen_amt + hive#forfeit_honey pollen_theft_amount (self :> world_object_i)))
+      (*(let (a, b) = self#get_pos in print_string("("^string_of_int(a)^","^string_of_int(b)^")"));*)
+        (if (self#get_pos = (World.size/2,World.size/2)) then
+        ((print_string "OH SNAP ");(fun _ -> (stolen_amt <- (stolen_amt + hive#forfeit_honey pollen_theft_amount (self :> world_object_i)))))
       else
-        fun _ -> ()
+        fun _ -> ())
+
 
   (* ### TODO: Part 6 Custom Events ### *)
 
